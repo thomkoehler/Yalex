@@ -5,20 +5,20 @@
 
 namespace lexer
 {
-   class Ast
+   class Predicate
    {
    public:
-      virtual ~Ast() {};
-      virtual std::function<bool(char)> getTransitionPred() const = 0;
+      virtual ~Predicate() {};
+      virtual bool operator()(char c) const = 0;
    };
 
-   class SimpleChar : public Ast
+   class SimpleChar : public Predicate
    {
    private:
       char _character;
 
    public:
       SimpleChar(char character);
-      virtual std::function<bool(char)> getTransitionPred() const;
+      virtual bool operator()(char c) const;
    };
 }

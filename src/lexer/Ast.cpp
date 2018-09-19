@@ -7,8 +7,7 @@ SimpleChar::SimpleChar(char character) : _character(character)
 {
 }
 
-std::function<bool(char)> SimpleChar::getTransitionPred() const
+bool SimpleChar::operator()(char c) const
 {
-   return [this](const char c) { return c == _character; };
+   return _character == c;
 }
-

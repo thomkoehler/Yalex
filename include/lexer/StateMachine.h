@@ -7,16 +7,14 @@
 #include <string>
 #include <optional>
 
+#include "lexer/Ast.h"
+
 namespace lexer
 {
-   class SimpleChar;
-
-   typedef std::function<bool(char)> TransitionPred;
-
    class StateMachine
    {
    private:
-      typedef std::tuple<size_t, TransitionPred> TransitionEntry;
+      typedef std::tuple<size_t, std::shared_ptr<Predicate>> TransitionEntry;
       typedef std::vector<std::shared_ptr<std::vector<TransitionEntry>>> TransitionTable;
 
       size_t _initialState;
@@ -25,12 +23,13 @@ namespace lexer
 
    public:
       StateMachine();
-      void addSimpleChar(SimpleChar &simpleChar);
+      void addPredicate(std::shared_ptr<Predicate> pred);
       std::optional<size_t> run(const std::string input) const;
 
    private:
       std::vector<size_t> calcNextStates(size_t state, char input) const;
       std::vector<size_t> calcNextStates(const std::vector<size_t> &states, char input) const;
+      void removeAcceptingState(size_t state);
    };
 
 }

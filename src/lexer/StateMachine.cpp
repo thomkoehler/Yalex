@@ -5,7 +5,6 @@
 
 #include "lexer/StateMachine.h"
 #include "lexer/LexerException.h"
-#include "lexer/Ast.h"
 #include "common/NotImplementedException.h"
 
 using namespace lexer;
@@ -14,8 +13,13 @@ StateMachine::StateMachine() : _initialState(0)
 {
 }
 
-void StateMachine::addSimpleChar(SimpleChar &simpleChar)
+void StateMachine::addPredicate(std::shared_ptr<Predicate> pred)
 {
+   auto currentState = _transitionTable.size();
+   std::vector<TransitionEntry> transitions = { std::make_tuple(currentState + 1, pred) };
+   _transitionTable.push_back(std::make_shared<std::vector<TransitionEntry>>(transitions));
+   removeAcceptingState(currentState);
+   _acceptingStates.push_back(currentState + 1);
 }
 
 std::optional<size_t> StateMachine::run(const std::string input) const
@@ -84,11 +88,20 @@ std::vector<size_t> StateMachine::calcNextStates(size_t state, char input) const
    std::vector<size_t> nextStates;
    for (const TransitionEntry &entry: *transitionEntry)
    {
-      if (std::get<1>(entry)(input))
+      if ((*std::get<1>(entry))(input))
       {
          nextStates.push_back(std::get<0>(entry));
       }
    }
 
    return nextStates;
+}
+
+void StateMachine::removeAcceptingState(size_t state)
+{
+   auto iter = std::find(_acceptingStates.begin(), _acceptingStates.end(), state);
+   if (iter != _acceptingStates.end())
+   {
+      _acceptingStates.erase(iter);
+   }
 }
