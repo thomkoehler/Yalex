@@ -68,8 +68,8 @@ std::vector<size_t> StateMachine::calcNextStates(const std::vector<size_t> &stat
 
    for (auto state : states)
    {
-      auto states = calcNextStates(state, input);
-      std::copy(states.begin(), states.end(), std::back_inserter(states));
+      auto nextStates = calcNextStates(state, input);
+      std::copy(nextStates.begin(), nextStates.end(), std::back_inserter(allStates));
    }
 
    std::sort(allStates.begin(), allStates.end());

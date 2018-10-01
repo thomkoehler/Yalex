@@ -13,9 +13,9 @@ int main(int argc, char *argv[])
    {
       StateMachine stateMachine;
 
-      stateMachine.addPredicate(std::make_shared<Predicate>(SimpleChar('a')));
-      stateMachine.addPredicate(std::make_shared<Predicate>(SimpleChar('b')));
-      stateMachine.addPredicate(std::make_shared<Predicate>(SimpleChar('c')));
+      stateMachine.addPredicate(std::make_shared<SimpleChar>(SimpleChar('a')));
+      stateMachine.addPredicate(std::make_shared<SimpleChar>(SimpleChar('b')));
+      stateMachine.addPredicate(std::make_shared<SimpleChar>(SimpleChar('c')));
 
       auto res = stateMachine.run("abc");
 
