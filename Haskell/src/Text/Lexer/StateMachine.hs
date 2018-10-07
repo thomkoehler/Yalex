@@ -2,16 +2,16 @@
 module Text.Lexer.StateMachine where
 
 import Data.Foldable
+import Data.Maybe
 
 type State = Int
-type TransitionEntry = (State, Char -> Bool)
 type TransitionTable = [(State, (State, Char -> Bool))]
 
 data StateMachine = StateMachine
   {
-    transitionTable :: !TransitionTable,
+    transitions :: !TransitionTable,
     initialState :: !State,
-    acceptingStates :: ![State]
+    acceptingState :: !State
   }
 
 calcNextStates :: StateMachine -> Char -> [State] -> [State]
@@ -19,29 +19,12 @@ calcNextStates stateMachine input = concatMap $ calcNextStates' stateMachine inp
 
 calcNextStates' :: StateMachine -> Char -> State -> [State]
 calcNextStates' stateMachine input state = 
-  map fst . filter (\(_, pred) -> pred input) . map snd . filter (\(entryState, _) -> entryState == state) $ transitionTable stateMachine
-
-{-
-run :: StateMachine -> String -> Int
-run stateMachine text = foldl max 0 positions
-  where
-    positions = map fst $ snd res
-    res = foldl go ([initialState stateMachine], []) $ zip text [1..]
-    acceptingStates' = acceptingStates stateMachine
-    go :: ([State], [(Int, State)]) -> (Char, Int) -> ([State], [(Int, State)])
-    go (currStates, acceptedStates) (char, pos) = 
-      if null currStates
-        then (currStates, acceptedStates)
-        else (nextStates, if null newAcceptedStates then acceptedStates else newAcceptedStates)
-      where
-        nextStates = calcNextStates stateMachine char currStates
-        newAcceptedStates = zip (repeat pos) $ filter (`elem` acceptingStates') nextStates
--}
+  map fst . filter (\(_, pred) -> pred input) . map snd . filter (\(entryState, _) -> entryState == state) $ transitions stateMachine
 
 run :: StateMachine -> String -> Int
 run stateMachine text = foldl max 0 positions
   where
-    acceptingStates' = acceptingStates stateMachine
+    acceptingState' = acceptingState stateMachine
     positions = map fst $ snd $ go [initialState stateMachine] [] 1 text
 
     go :: [State] -> [(Int, State)] -> Int -> String -> ([State], [(Int, State)])
@@ -51,8 +34,24 @@ run stateMachine text = foldl max 0 positions
         (c:cs) -> 
           let
             nextStates = calcNextStates stateMachine c currStates
-            newAcceptedStates = zip (repeat pos) $ filter (`elem` acceptingStates') nextStates
+            newAcceptedStates = zip (repeat pos) $ filter (== acceptingState') nextStates
           in
             if null nextStates
               then (currStates, acceptedStates)
               else go nextStates (if null newAcceptedStates then acceptedStates else newAcceptedStates) (pos + 1) cs
+
+
+transitionStates :: StateMachine -> [Int]
+transitionStates (StateMachine ts is as) = filter (\state -> state /= is && state /= as) $ map fst ts
+
+changeStates :: [(State, State)] -> StateMachine -> StateMachine
+changeStates stateChanges stateMachine@(StateMachine ts is as) = 
+  let
+    lookupState oldState = fromJust $ lookup oldState stateChanges
+    newTransitions = map (\(st0, (st1, pred)) -> (lookupState st0, (lookupState st1, pred))) ts
+  in
+    StateMachine newTransitions (lookupState is) (lookupState as)
+
+
+instance Semigroup StateMachine where
+  st0 <> st1 = undefined

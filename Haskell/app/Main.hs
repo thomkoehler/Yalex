@@ -8,9 +8,9 @@ anyChar = const True
 
 sm = StateMachine 
   {
-    transitionTable = [(0, (1, isA)), (1, (2, anyChar)), (1, (1, anyChar)), (2, (3, isB))],
+    transitions = [(0, (1, isA)), (1, (2, anyChar)), (1, (1, anyChar)), (2, (3, isB))],
     initialState = 0,
-    acceptingStates = [3]
+    acceptingState = 3
   }
 
 main :: IO ()
