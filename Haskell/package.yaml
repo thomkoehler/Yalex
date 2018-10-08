@@ -19,6 +19,7 @@ library:
   source-dirs: src
   exposed-modules:
     - Text.Lexer.StateMachine
+    - Text.Lexer.Token
 
 executables:
   ParserStuff:

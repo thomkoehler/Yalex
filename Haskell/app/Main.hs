@@ -1,20 +1,29 @@
 module Main where
 
 import Text.Lexer.StateMachine
+import Text.Lexer.Token
 
-isA = (== 'a')
-isB = (== 'b')
-anyChar = const True
+sma :: StateMachine
+sma = createStateMachine (tokenPred (TokenChar 'a'))
 
-sm = StateMachine 
-  {
-    transitions = [(0, (1, isA)), (1, (2, anyChar)), (1, (1, anyChar)), (2, (3, isB))],
-    initialState = 0,
-    acceptingState = 3
-  }
+smb :: StateMachine
+smb = createStateMachine (tokenPred (TokenChar 'b'))
+
+smc :: StateMachine
+smc = createStateMachine (tokenPred (TokenChar 'c'))
+
+smAny :: StateMachine
+smAny = createStateMachine (tokenPred TokenAnyChar)
+
+sm = sma <> smb <> smc
+
 
 main :: IO ()
 main = do
+  print sma
+  print $ sma <> smb
+  print $ sma <> smb <> smc
+
   print $ run sm "a123b"
   print $ run sm "aaaabbbb"
   print $ run sm "a1bcdefg"
