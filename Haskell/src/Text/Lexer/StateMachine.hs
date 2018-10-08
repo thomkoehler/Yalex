@@ -4,6 +4,7 @@ module Text.Lexer.StateMachine
   StateMachine, 
   Predicate(..), 
   createStateMachine, 
+  many1,
   run
 ) 
 where
@@ -75,8 +76,19 @@ instance Semigroup StateMachine where
     in
       StateMachine initialState0 (acceptingState1 + maxState0) $ transitions st0 ++ newTransitions1
 
+-- regex +
+many1 :: StateMachine -> StateMachine
+many1 sm@(StateMachine is as ts) = 
+  let
+    newTransitions =  map (\(st0, (st1, pred)) -> (st0, (is, pred))) $ acceptingStateTransitions sm
+  in
+    sm { transitions = ts ++ newTransitions }
+
 transitionStates :: StateMachine -> [Int]
 transitionStates (StateMachine is as ts) = filter (\state -> state /= is && state /= as) $ map fst ts
 
 changeTransitionStates :: (State -> State) -> TransitionTable -> TransitionTable
 changeTransitionStates change = map (\(st0, (st1, pred)) -> (change st0, (change st1, pred)))
+
+acceptingStateTransitions :: StateMachine -> TransitionTable
+acceptingStateTransitions (StateMachine _ as ts) = filter (\(_, (state, _)) -> state == as) ts
