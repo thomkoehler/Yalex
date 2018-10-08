@@ -12,7 +12,7 @@ smb = createStateMachine (tokenPred (TokenChar 'b'))
 smAny :: StateMachine
 smAny = createStateMachine (tokenPred TokenAnyChar)
 
-sm = sma <> smb <> many1 smAny <> smb <> sma
+sm = sma <> smb <> many smAny <> smb <> sma
 
 
 main :: IO ()
