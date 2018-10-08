@@ -68,8 +68,9 @@ instance Semigroup StateMachine where
       initialState0 = initialState st0
       maxState0 = foldl' max 0 $ initialState0 : acceptingState st0 : transitionStates st0
       initialState1 = initialState st1
+      acceptingState0 = acceptingState st0
       acceptingState1 = acceptingState st1
-      stateChange1 state = if state == initialState1 then acceptingState1 else state + maxState0
+      stateChange1 state = if state == initialState1 then acceptingState0 else state + maxState0
       newTransitions1 = changeTransitionStates stateChange1 $ transitions st1
     in
       StateMachine initialState0 (acceptingState1 + maxState0) $ transitions st0 ++ newTransitions1

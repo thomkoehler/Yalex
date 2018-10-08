@@ -28,3 +28,4 @@ main = do
   print $ run sm "aaaabbbb"
   print $ run sm "a1bcdefg"
   print $ run sm "ab"
+  print $ run sm "abc"
