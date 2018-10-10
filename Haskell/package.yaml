@@ -14,12 +14,13 @@ description: Please see the README on GitHub at <https://github.com/githubuser/P
 
 dependencies:
 - base >= 4.7 && < 5
+- HTF
 
 library:
   source-dirs: src
   exposed-modules:
     - Text.Lexer.StateMachine
-    - Text.Lexer.Token
+    - Text.Lexer.Parser
 
 executables:
   ParserStuff:
@@ -29,6 +30,7 @@ executables:
     - -threaded
     - -rtsopts
     - -with-rtsopts=-N
+    - -Wall
     dependencies:
     - ParserStuff
 
@@ -40,5 +42,6 @@ tests:
     - -threaded
     - -rtsopts
     - -with-rtsopts=-N
+    - -Wall
     dependencies:
     - ParserStuff

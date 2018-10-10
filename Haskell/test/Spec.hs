@@ -1,2 +1,10 @@
+{-# OPTIONS_GHC -F -pgmF htfpp #-}
+
+module Main(main) where
+
+import Test.Framework
+import {-@ HTF_TESTS @-} Test.Text.Lexer.StateMachine
+
+
 main :: IO ()
-main = putStrLn "Test suite not yet implemented"
+main = htfMain htf_importedTests

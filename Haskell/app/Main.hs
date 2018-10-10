@@ -1,22 +1,11 @@
 module Main where
 
+import Text.Lexer.Parser
 import Text.Lexer.StateMachine
-import Text.Lexer.Token
-
-sma :: StateMachine
-sma = createStateMachine (tokenPred (TokenChar 'a'))
-
-smb :: StateMachine
-smb = createStateMachine (tokenPred (TokenChar 'b'))
-
-smAny :: StateMachine
-smAny = createStateMachine (tokenPred TokenAnyChar)
-
-sm = sma <> smb <> many smAny <> smb <> sma
-
 
 main :: IO ()
 main = do
+  let sm = parse "abba"
   print sm
   print $ run sm "a123b"
   print $ run sm "aaaabbbb"
