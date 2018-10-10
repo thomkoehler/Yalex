@@ -29,7 +29,5 @@ prop_Chars2 = stateMachineTest "abc" "abcdefg" 3
 prop_Chars3 :: Bool
 prop_Chars3 = stateMachineTest "abc" "bc" 0
 
-
-
 stateMachineTest :: String -> String -> Int -> Bool
-stateMachineTest pat input match = run (parse pat) input == match
+stateMachineTest pat input match = run (parsePattern pat) input == match

@@ -6,12 +6,12 @@ module Text.Lexer.StateMachine
   newStateMachine, 
   many1,
   many,
+  optional,
   run
 ) 
 where
 
 import Data.Foldable
-import Data.Maybe
 import Data.List
 import Control.Arrow
 
@@ -42,7 +42,7 @@ calcNextStates stateMachine input = concatMap $ calcNextStates' stateMachine inp
 calcNextStates' :: StateMachine -> Char -> State -> [State]
 calcNextStates' stateMachine input state = nub $ nextStates ++ bypassedStates
   where
-    nextStates = map fst . filter (\(_, pred) -> predFun pred input) . map snd . filter (\(entryState, _) -> entryState == state) $ transitions stateMachine
+    nextStates = map fst . filter (\(_, predicate) -> predFun predicate input) . map snd . filter (\(entryState, _) -> entryState == state) $ transitions stateMachine
     bypassedStates = map snd . filter (\(st, _) -> st == state) $ bypasses stateMachine
 
 run :: StateMachine -> String -> Int
@@ -65,7 +65,7 @@ run stateMachine text = foldl max 0 positions
               else go nextStates (if null newAcceptedStates then acceptedStates else newAcceptedStates) (pos + 1) cs
 
 newStateMachine :: Predicate -> StateMachine
-newStateMachine pred = StateMachine 0 1 [(0, (1, pred))] []
+newStateMachine predicate = StateMachine 0 1 [(0, (1, predicate))] []
 
 instance Semigroup StateMachine where
   st0 <> st1 = 
@@ -81,9 +81,9 @@ instance Semigroup StateMachine where
 
 -- regex +
 many1 :: StateMachine -> StateMachine
-many1 sm@(StateMachine is as ts _) = 
+many1 sm@(StateMachine is _ ts _) = 
   let
-    newTransitions =  map (\(st0, (st1, pred)) -> (st0, (is, pred))) $ acceptingStateTransitions sm
+    newTransitions =  map (\(st0, (_, predicate)) -> (st0, (is, predicate))) $ acceptingStateTransitions sm
   in
     sm { transitions = ts ++ newTransitions }
 
@@ -95,13 +95,13 @@ optional sm@(StateMachine is as _ bs) = sm { bypasses = (is, as) : bs }
 many :: StateMachine -> StateMachine
 many sm@(StateMachine is as ts _) = sm { acceptingState = is, transitions = map stateChange ts }
   where
-    stateChange trans@(st0, (st1, pred)) = if st1 == as then (st0, (is, pred)) else trans
+    stateChange trans@(st0, (st1, predicate)) = if st1 == as then (st0, (is, predicate)) else trans
 
 transitionStates :: StateMachine -> [Int]
 transitionStates (StateMachine is as ts _) = filter (\state -> state /= is && state /= as) $ map fst ts
 
 changeTransitionStates :: (State -> State) -> TransitionList -> TransitionList
-changeTransitionStates change = map (\(st0, (st1, pred)) -> (change st0, (change st1, pred)))
+changeTransitionStates change = map (\(st0, (st1, predicate)) -> (change st0, (change st1, predicate)))
 
 changeBypassesStates :: (State -> State) -> [(State, State)] -> [(State, State)]
 changeBypassesStates change = map $ change *** change

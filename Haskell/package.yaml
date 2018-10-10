@@ -15,12 +15,15 @@ description: Please see the README on GitHub at <https://github.com/githubuser/P
 dependencies:
 - base >= 4.7 && < 5
 - HTF
+- parsec
 
 library:
   source-dirs: src
   exposed-modules:
     - Text.Lexer.StateMachine
     - Text.Lexer.Parser
+  ghc-options:
+    - -Wall
 
 executables:
   ParserStuff:
