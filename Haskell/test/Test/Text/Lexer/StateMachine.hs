@@ -29,5 +29,17 @@ prop_Chars2 = stateMachineTest "abc" "abcdefg" 3
 prop_Chars3 :: Bool
 prop_Chars3 = stateMachineTest "abc" "bc" 0
 
+prop_AnyChar1 :: Char -> Bool
+prop_AnyChar1 c = stateMachineTest "." [c] 1
+
+prop_AnyChar2 :: Char -> Bool
+prop_AnyChar2 c = stateMachineTest "ab.cd" ("ab" ++ [c] ++ "cd") 5
+
+prop_AnyChar3 :: Bool
+prop_AnyChar3 = stateMachineTest "a." "ba" 0
+
+prop_AnyChar4 :: Bool
+prop_AnyChar4 = stateMachineTest "." "" 0
+
 stateMachineTest :: String -> String -> Int -> Bool
 stateMachineTest pat input match = run (parsePattern pat) input == match

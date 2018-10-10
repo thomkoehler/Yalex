@@ -10,12 +10,31 @@ import Text.Lexer.StateMachine
 simpleChar :: Parser StateMachine
 simpleChar = fmap (newStateMachine . tokenPred . TokenChar) letter
 
+anyChar :: Parser StateMachine
+anyChar = do
+  char '.'
+  return $ newStateMachine $ tokenPred TokenAnyChar
+
 patt :: Parser StateMachine
 patt = do
-  sms <- Parsec.many simpleChar
+  p <- choice
+    [
+      Text.Lexer.Parser.anyChar,
+      simpleChar
+    ] 
+
+  q <- quantifier
+  return $ q p;
+
+quantifier :: Parser (StateMachine -> StateMachine)
+quantifier = return id
+
+patterns :: Parser StateMachine
+patterns = do
+  sms <- Parsec.many1 patt
   return $ foldl1' (<>) sms
 
 parsePattern :: String -> StateMachine
-parsePattern input = case parse patt "" input of
+parsePattern input = case parse patterns "" input of
   Left err -> error $ show err
   Right sm -> sm
