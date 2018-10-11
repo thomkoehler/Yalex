@@ -5,6 +5,6 @@ import Text.Lexer.StateMachine
 
 main :: IO ()
 main = do
-  let sm = parsePattern "abba"
+  let sm = parsePattern "a.?c"
   print sm
-  print $ run sm "abba"
+  print $ run sm "ac"

@@ -4,16 +4,18 @@ module Text.Lexer.Parser(parsePattern) where
 import Data.List
 import Text.ParserCombinators.Parsec as Parsec
 
-import Text.Lexer.Token
-import Text.Lexer.StateMachine
+import Text.Lexer.Predicate
+import Text.Lexer.StateMachine as SM
+
+
+metaChars :: String
+metaChars = "*+?()"
 
 simpleChar :: Parser StateMachine
-simpleChar = fmap (newStateMachine . tokenPred . TokenChar) letter
+simpleChar = fmap (newStateMachine . charPredicate) (noneOf metaChars)
 
 anyChar :: Parser StateMachine
-anyChar = do
-  char '.'
-  return $ newStateMachine $ tokenPred TokenAnyChar
+anyChar = char '.' >> return (newStateMachine anyCharPredicate)
 
 patt :: Parser StateMachine
 patt = do
@@ -23,11 +25,16 @@ patt = do
       simpleChar
     ] 
 
-  q <- quantifier
+  q <- option id quantifier
   return $ q p;
 
 quantifier :: Parser (StateMachine -> StateMachine)
-quantifier = return id
+quantifier = choice
+  [
+    char '*' >> return SM.many,
+    char '+' >> return SM.many1,
+    char '?' >> return SM.optional
+  ]
 
 patterns :: Parser StateMachine
 patterns = do

@@ -41,5 +41,45 @@ prop_AnyChar3 = stateMachineTest "a." "ba" 0
 prop_AnyChar4 :: Bool
 prop_AnyChar4 = stateMachineTest "." "" 0
 
+prop_Optional1 :: Bool
+prop_Optional1 = stateMachineTest ".?" "a" 1
+
+prop_Optional2 :: Bool
+prop_Optional2 = stateMachineTest ".?" "" 0
+
+prop_Optional3 :: Bool
+prop_Optional3 = stateMachineTest "a.?c" "abc" 3
+
+prop_Optional4 :: Bool
+prop_Optional4 = stateMachineTest "a.?c" "ac" 2
+
+prop_Optional5 :: Bool
+prop_Optional5 = stateMachineTest "aa?c" "ac" 2
+
+prop_Optional6 :: Bool
+prop_Optional6 = stateMachineTest "aa?c" "aac" 3
+
+prop_Many1 :: Bool
+prop_Many1 = stateMachineTest "a.*c" "ac" 2
+
+prop_Many2 :: Bool
+prop_Many2 = stateMachineTest "a.*c" "abc" 3
+
+prop_Many3 :: Bool
+prop_Many3 = stateMachineTest "a.*c" "aaaaabcccc" 10
+
+prop_Many11 :: Bool
+prop_Many11 = stateMachineTest "a+" "a" 1
+
+prop_Many12 :: Bool
+prop_Many12 = stateMachineTest "a+b" "b" 0
+
+prop_Many13 :: Bool
+prop_Many13 = stateMachineTest "ab+c" "abc" 3
+
+prop_Many14 :: Bool
+prop_Many14 = stateMachineTest "ab+c" "abbbbc" 6
+
+
 stateMachineTest :: String -> String -> Int -> Bool
 stateMachineTest pat input match = run (parsePattern pat) input == match

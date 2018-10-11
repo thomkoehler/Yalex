@@ -15,14 +15,7 @@ import Data.Foldable
 import Data.List
 import Control.Arrow
 
-data Predicate = Predicate
-  {
-    predDescription :: !String,
-    predFun :: Char -> Bool
-  }
-
-instance Show Predicate where
-  show = predDescription
+import Text.Lexer.Predicate
 
 type State = Int
 type TransitionList = [(State, (State, Predicate))]
@@ -37,13 +30,12 @@ data StateMachine = StateMachine
   deriving Show
 
 calcNextStates :: StateMachine -> Char -> [State] -> [State]
-calcNextStates stateMachine input = concatMap $ calcNextStates' stateMachine input
+calcNextStates sm@(StateMachine _ _ _ bps) input states = concatMap (calcNextStates' sm input) $ nub states ++ bypassed
+  where
+    bypassed = map snd $ filter (\(fromState, _) -> elem fromState states) bps
 
 calcNextStates' :: StateMachine -> Char -> State -> [State]
-calcNextStates' stateMachine input state = nub $ nextStates ++ bypassedStates
-  where
-    nextStates = map fst . filter (\(_, predicate) -> predFun predicate input) . map snd . filter (\(entryState, _) -> entryState == state) $ transitions stateMachine
-    bypassedStates = map snd . filter (\(st, _) -> st == state) $ bypasses stateMachine
+calcNextStates' stateMachine input state = map fst . filter (\(_, predicate) -> predFun predicate input) . map snd . filter (\(entryState, _) -> entryState == state) $ transitions stateMachine
 
 run :: StateMachine -> String -> Int
 run stateMachine text = foldl max 0 positions
