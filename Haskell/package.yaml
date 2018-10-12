@@ -21,6 +21,7 @@ dependencies:
 library:
   source-dirs: src
   exposed-modules:
+    - Text.Lexer
     - Text.Lexer.StateMachine
     - Text.Lexer.Parser
   ghc-options:
