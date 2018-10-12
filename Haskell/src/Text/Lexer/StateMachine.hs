@@ -16,38 +16,38 @@ import Data.List
 import Control.Arrow
 
 import Text.Lexer.Predicate
+import Text.Lexer.Stream
 
 type State = Int
-type TransitionList = [(State, (State, Predicate))]
+type TransitionList c = [(State, (State, Predicate c))]
 
-data StateMachine = StateMachine
+data StateMachine c = StateMachine
   {
     initialState :: !State,
     acceptingState :: !State,
-    transitions :: !TransitionList,
+    transitions :: TransitionList c,
     bypasses :: [(State, State)]
   }
   deriving Show
 
-calcNextStates :: StateMachine -> Char -> [State] -> [State]
+calcNextStates :: StateMachine c -> c -> [State] -> [State]
 calcNextStates sm@(StateMachine _ _ _ bps) input states = concatMap (calcNextStates' sm input) $ nub states ++ bypassed
   where
     bypassed = map snd $ filter (\(fromState, _) -> elem fromState states) bps
 
-calcNextStates' :: StateMachine -> Char -> State -> [State]
+calcNextStates' :: StateMachine  c -> c -> State -> [State]
 calcNextStates' stateMachine input state = map fst . filter (\(_, predicate) -> predFun predicate input) . map snd . filter (\(entryState, _) -> entryState == state) $ transitions stateMachine
 
-run :: StateMachine -> String -> Int
-run stateMachine text = foldl max 0 positions
+run :: (Stream s c) => StateMachine c -> s -> Int
+run stateMachine stream = foldl max 0 positions
   where
     acceptingState' = acceptingState stateMachine
-    positions = map fst $ snd $ go [initialState stateMachine] [] 1 text
+    positions = map fst $ snd $ go [initialState stateMachine] [] 1 stream
 
-    go :: [State] -> [(Int, State)] -> Int -> String -> ([State], [(Int, State)])
-    go currStates acceptedStates pos currText = 
-      case currText of
-        [] ->  (currStates, acceptedStates)
-        (c:cs) -> 
+    go currStates acceptedStates pos currStream = 
+      case Text.Lexer.Stream.uncons currStream of
+        Nothing -> (currStates, acceptedStates)
+        Just (c, cs) -> 
           let
             nextStates = calcNextStates stateMachine c currStates
             newAcceptedStates = zip (repeat pos) $ filter (== acceptingState') nextStates
@@ -56,10 +56,10 @@ run stateMachine text = foldl max 0 positions
               then (currStates, acceptedStates)
               else go nextStates (if null newAcceptedStates then acceptedStates else newAcceptedStates) (pos + 1) cs
 
-newStateMachine :: Predicate -> StateMachine
+newStateMachine :: Predicate c -> StateMachine c
 newStateMachine predicate = StateMachine 0 1 [(0, (1, predicate))] []
 
-instance Semigroup StateMachine where
+instance Semigroup (StateMachine c) where
   st0 <> st1 = 
     let
       initialState0 = initialState st0
@@ -72,7 +72,7 @@ instance Semigroup StateMachine where
       StateMachine initialState0 (acceptingState st1 + maxState0) (transitions st0 ++ newTransitions1) (bypasses st0 ++ newBypasses1)
 
 -- regex +
-many1 :: StateMachine -> StateMachine
+many1 :: StateMachine c -> StateMachine c
 many1 sm@(StateMachine is _ ts _) = 
   let
     newTransitions =  map (\(st0, (_, predicate)) -> (st0, (is, predicate))) $ acceptingStateTransitions sm
@@ -80,23 +80,23 @@ many1 sm@(StateMachine is _ ts _) =
     sm { transitions = ts ++ newTransitions }
 
 -- regex ?
-optional :: StateMachine -> StateMachine
+optional :: StateMachine c -> StateMachine c
 optional sm@(StateMachine is as _ bs) = sm { bypasses = (is, as) : bs }
 
 -- regex *
-many :: StateMachine -> StateMachine
+many :: StateMachine c -> StateMachine c
 many sm@(StateMachine is as ts _) = sm { acceptingState = is, transitions = map stateChange ts }
   where
     stateChange trans@(st0, (st1, predicate)) = if st1 == as then (st0, (is, predicate)) else trans
 
-transitionStates :: StateMachine -> [Int]
+transitionStates :: StateMachine c -> [Int]
 transitionStates (StateMachine is as ts _) = filter (\state -> state /= is && state /= as) $ map fst ts
 
-changeTransitionStates :: (State -> State) -> TransitionList -> TransitionList
+changeTransitionStates :: (State -> State) -> TransitionList c -> TransitionList c
 changeTransitionStates change = map (\(st0, (st1, predicate)) -> (change st0, (change st1, predicate)))
 
 changeBypassesStates :: (State -> State) -> [(State, State)] -> [(State, State)]
 changeBypassesStates change = map $ change *** change
 
-acceptingStateTransitions :: StateMachine -> TransitionList
+acceptingStateTransitions :: StateMachine c -> TransitionList c
 acceptingStateTransitions (StateMachine _ as ts _) = filter (\(_, (state, _)) -> state == as) ts

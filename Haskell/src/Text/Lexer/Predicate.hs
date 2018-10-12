@@ -1,22 +1,22 @@
 
 module Text.Lexer.Predicate where
 
-data Predicate = Predicate
+data Predicate c = Predicate
   {
     predDescription :: !String,
-    predFun :: Char -> Bool
+    predFun :: c -> Bool
   }
 
-instance Show Predicate where
+instance Show (Predicate c) where
   show = predDescription
 
-charPredicate :: Char -> Predicate
+charPredicate :: (Show c, Ord c) => c -> Predicate c
 charPredicate c = Predicate { predDescription = show c, predFun = (== c) }
 
-anyCharPredicate :: Predicate
+anyCharPredicate :: Predicate c
 anyCharPredicate = Predicate { predDescription = "'.'", predFun = const True }
 
-rangesPredicate :: [(Char, Char)] -> Predicate
+rangesPredicate :: (Show c, Ord c) => [(c, c)] -> Predicate c
 rangesPredicate ranges = Predicate 
   { 
     predDescription = "Range: " ++ show ranges, 
