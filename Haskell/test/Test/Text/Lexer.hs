@@ -5,12 +5,10 @@ module Test.Text.Lexer(htf_thisModulesTests) where
 
 import Test.Framework
 
-import Text.Lexer.Parser
 import Text.Lexer
 
 data Token 
-  = Token
-  | TokenIf
+  = TokenIf
   | TokenThen
   | TokenElse
   | TokenInt Integer

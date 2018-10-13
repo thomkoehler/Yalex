@@ -19,6 +19,6 @@ instance Stream T.Text Char where
   uncons = T.uncons
 
 
---TODO cons :: Stream s c => Int -> s -> (s, s)
+--TODO consume :: Stream s c => Int -> s -> (s, s)
 consume :: Stream s c => Int -> s -> Maybe (s, s)
 consume = undefined
