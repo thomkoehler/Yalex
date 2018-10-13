@@ -11,7 +11,13 @@ import Text.Lexer
 
 data Token 
   = Token
+  | TokenEof
   deriving Eq
 
+lexerDef =
+  [
+    (":*", \s -> Nothing)
+  ]
+
 prop_Lexer :: Bool
-prop_Lexer = null $ scan [(".*", const Token)] ""
+prop_Lexer = scan lexerDef TokenEof "" == [TokenEof]
