@@ -80,6 +80,18 @@ prop_Many13 = stateMachineTest "ab+c" "abc" 3
 prop_Many14 :: Bool
 prop_Many14 = stateMachineTest "ab+c" "abbbbc" 6
 
+prop_Escape1 :: Bool
+prop_Escape1 = stateMachineTest "\n" "\n" 1
+
+prop_Escape2 :: Bool
+prop_Escape2 = stateMachineTest "\n*" "\n\n\n" 3
+
+prop_oneOf1 :: Bool
+prop_oneOf1 = stateMachineTest "a[1234567890]*b" "a321b" 5
+
+prop_oneOf2 :: Bool
+prop_oneOf2 = stateMachineTest "a[1234567890]*b" "321b" 0
+
 
 stateMachineTest :: String -> String -> Int -> Bool
 stateMachineTest pat input match = run (parsePattern pat) input == match

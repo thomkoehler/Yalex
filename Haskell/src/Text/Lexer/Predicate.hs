@@ -22,3 +22,10 @@ rangesPredicate ranges = Predicate
     predDescription = "Range: " ++ show ranges, 
     predFun = \c -> any (\(from, to) -> c >= from && c <= to) ranges
   }
+
+oneOfPredicate ::  (Show c, Ord c) => [c] -> Predicate c
+oneOfPredicate chars = Predicate
+  { 
+    predDescription = "One of: " ++ show chars, 
+    predFun = flip elem chars
+  }

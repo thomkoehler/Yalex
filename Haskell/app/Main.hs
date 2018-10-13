@@ -5,6 +5,6 @@ import Text.Lexer.StateMachine
 
 main :: IO ()
 main = do
-  let sm = parsePattern "a.?c"
+  let sm = parsePattern "a[1234567890]*b"
   print sm
-  print $ run sm "ac"
+  print $ run sm "321b"

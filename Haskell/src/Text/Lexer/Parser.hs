@@ -4,12 +4,35 @@ module Text.Lexer.Parser(parsePattern) where
 import Data.List
 import Text.ParserCombinators.Parsec as Parsec
 
+
 import Text.Lexer.Predicate
 import Text.Lexer.StateMachine as SM
 
 
 metaChars :: String
-metaChars = "*+?()"
+metaChars = ".*+?()[]\\"
+
+unescapeChar :: Char -> Char
+unescapeChar 'n' = '\n'
+unescapeChar 'r' = '\r'
+unescapeChar 't' = '\t'
+unescapeChar 'f' = '\f'
+unescapeChar c = c
+
+unescapeStr :: String -> String
+unescapeStr [] = []
+unescapeStr ('\\' : c : rest) = unescapeChar c : rest
+unescapeStr (c:cs) = c : unescapeStr cs
+
+oneOf :: Parser (StateMachine Char)
+oneOf = do
+  _ <- char '['
+  chars <- Parsec.many1 (noneOf "]")
+  _ <- char ']'
+  return $ newStateMachine $ oneOfPredicate $ unescapeStr chars
+
+escapeChar :: Parser (StateMachine Char)
+escapeChar = char '\\' >> fmap (newStateMachine . charPredicate . unescapeChar) Parsec.anyChar 
 
 simpleChar :: Parser (StateMachine Char)
 simpleChar = fmap (newStateMachine . charPredicate) (noneOf metaChars)
@@ -21,8 +44,10 @@ patt :: Parser (StateMachine Char)
 patt = do
   p <- choice
     [
+      simpleChar,
+      escapeChar,
       Text.Lexer.Parser.anyChar,
-      simpleChar
+      Text.Lexer.Parser.oneOf
     ] 
 
   q <- option id quantifier

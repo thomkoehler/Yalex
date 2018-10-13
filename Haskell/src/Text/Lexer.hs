@@ -16,9 +16,9 @@ scan lexerDef eofToken stream = go stream []
        Nothing -> tokens ++ [eofToken]
        _ -> 
         let 
-          lengths = map (\(sm, fun) -> (run sm input, fun)) lexerDef'
+          lengths = map (\(sm, fun'') -> (run sm input, fun'')) lexerDef'
           maxLength = foldl' (\maxPos (pos, _) -> max maxPos pos) 0 lengths
-          (Just (_, fun)) = find (\(pos, fun) -> maxLength == pos) lengths
+          (Just (_, fun')) = find (\(pos, _) -> maxLength == pos) lengths
         in
           if maxLength == 0
             then tokens
@@ -26,4 +26,4 @@ scan lexerDef eofToken stream = go stream []
               let 
                 (curr, rest) = fromJust $ consume maxLength input
               in
-                go rest $ tokens ++ maybeToList (fun curr)
+                go rest $ tokens ++ maybeToList (fun' curr)
