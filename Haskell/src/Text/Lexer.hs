@@ -3,17 +3,18 @@ module Text.Lexer(scan) where
 
 import Data.List
 import Data.Maybe
+import Control.Arrow
 
 import Text.Lexer.Stream as Stream
 import Text.Lexer.Parser
 import Text.Lexer.StateMachine
 
-scan :: [(String, String -> Maybe token)] -> token -> String -> [token]
-scan lexerDef eofToken stream = go stream []
+scan :: [(String, String -> Maybe token)] -> String -> (Bool, [token])
+scan lexerDef stream = go stream []
   where 
-    lexerDef' = map (\(s, fun) -> (parsePattern s, fun)) lexerDef
+    lexerDef' = map (first parsePattern) lexerDef
     go input tokens = case Stream.uncons input of
-       Nothing -> tokens ++ [eofToken]
+       Nothing -> (True, tokens)
        _ -> 
         let 
           lengths = map (\(sm, fun'') -> (run sm input, fun'')) lexerDef'
@@ -21,7 +22,7 @@ scan lexerDef eofToken stream = go stream []
           (Just (_, fun')) = find (\(pos, _) -> maxLength == pos) lengths
         in
           if maxLength == 0
-            then tokens
+            then (False, tokens)
             else
               let 
                 (curr, rest) = fromJust $ consume maxLength input

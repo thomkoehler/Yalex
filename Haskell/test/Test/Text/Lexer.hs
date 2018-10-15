@@ -12,9 +12,9 @@ data Token
   | TokenThen
   | TokenElse
   | TokenInt Integer
-  | TokenEof
   deriving Eq
 
+lexerDef :: [(String, String -> Maybe Token)]
 lexerDef =
   [
     ("[\\r\\n\\t]*", const Nothing),
@@ -25,10 +25,13 @@ lexerDef =
   ]
 
 prop_Lexer1 :: Bool
-prop_Lexer1 = scan lexerDef TokenEof "" == [TokenEof]
+prop_Lexer1 = scan lexerDef "" == (True, [])
 
 prop_Lexer2 :: Bool
-prop_Lexer2 = scan lexerDef TokenEof " 123 " == [TokenInt 123, TokenEof]
+prop_Lexer2 = scan lexerDef "\r\n  \t" == (True, [])
 
 prop_Lexer3 :: Bool
-prop_Lexer3 = scan lexerDef TokenEof "if 1 then 2 else 3" == [TokenIf, TokenInt 1, TokenThen, TokenInt 2, TokenElse, TokenInt 3, TokenEof]
+prop_Lexer3 = scan lexerDef " 123 " == (True, [TokenInt 123])
+
+prop_Lexer4 :: Bool
+prop_Lexer4 = scan lexerDef "if 1 then 2 else 3" == (True, [TokenIf, TokenInt 1, TokenThen, TokenInt 2, TokenElse, TokenInt 3])
