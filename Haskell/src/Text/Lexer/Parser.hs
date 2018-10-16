@@ -10,7 +10,7 @@ import Text.Lexer.StateMachine as SM
 
 
 metaChars :: String
-metaChars = ".*+?()[]\\"
+metaChars = ".*+-?()[]\\"
 
 unescapeChar :: Char -> Char
 unescapeChar 'n' = '\n'

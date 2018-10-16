@@ -11,6 +11,8 @@ data Token
   | TokenInt Integer
   deriving (Eq, Show)
 
+
+lexerDef :: [(String, String -> Maybe Token)]
 lexerDef =
   [
     ("[ \\r\\n\\t]*", const Nothing),

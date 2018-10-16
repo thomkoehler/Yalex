@@ -1,5 +1,5 @@
 
-module Text.Lexer(scan) where
+module Text.Lexer(scan, scan') where
 
 import Data.List
 import Data.Maybe
@@ -9,15 +9,19 @@ import Text.Lexer.Stream as Stream
 import Text.Lexer.Parser
 import Text.Lexer.StateMachine
 
-scan :: [(String, String -> Maybe token)] -> String -> (Bool, [token])
-scan lexerDef stream = go stream []
+scan :: [(String, String -> Maybe t)] -> String -> (Bool, [t])
+scan lexerDef = scan' lexerDef'
   where 
     lexerDef' = map (first parsePattern) lexerDef
+   
+scan' :: Stream s c => [(StateMachine c, s -> Maybe t)] -> s -> (Bool, [t])
+scan' lexerDef stream = go stream []
+  where 
     go input tokens = case Stream.uncons input of
        Nothing -> (True, tokens)
        _ -> 
         let 
-          lengths = map (\(sm, fun'') -> (run sm input, fun'')) lexerDef'
+          lengths = map (\(sm, fun'') -> (run sm input, fun'')) lexerDef
           maxLength = foldl' (\maxPos (pos, _) -> max maxPos pos) 0 lengths
           (Just (_, fun')) = find (\(pos, _) -> maxLength == pos) lengths
         in
