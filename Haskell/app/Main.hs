@@ -13,7 +13,7 @@ data Token
 
 lexerDef =
   [
-    ("[\\r\\n\\t]*", const Nothing),
+    ("[ \\r\\n\\t]*", const Nothing),
     ("if", const (Just TokenIf)),
     ("then", const (Just TokenThen)),
     ("else", const (Just TokenElse)),

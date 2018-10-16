@@ -21,7 +21,7 @@ unescapeChar c = c
 
 unescapeStr :: String -> String
 unescapeStr [] = []
-unescapeStr ('\\' : c : rest) = unescapeChar c : rest
+unescapeStr ('\\' : c : rest) = unescapeChar c : unescapeStr rest
 unescapeStr (c:cs) = c : unescapeStr cs
 
 oneOf :: Parser (StateMachine Char)
