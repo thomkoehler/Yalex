@@ -71,6 +71,24 @@ instance Semigroup (StateMachine c) where
     in
       StateMachine initialState0 (acceptingState st1 + maxState0) (transitions st0 ++ newTransitions1) (bypasses st0 ++ newBypasses1)
 
+(<|>) :: StateMachine c -> StateMachine c -> StateMachine c
+st0 <|> st1 = 
+  let
+      initialState0 = initialState st0
+      acceptingState0 = acceptingState st0
+      initialState1 = initialState st1
+      acceptingState1 = acceptingState st1
+      maxState0 = foldl' max 0 $ initialState0 : acceptingState0 : transitionStates st0
+      stateChange1 state = case state of
+        initialState1 -> initialState0
+        acceptingState1 -> acceptingState0
+        _ -> state + maxState0
+
+      newTransitions1 = changeTransitionStates stateChange1 $ transitions st1
+      newBypasses1 = changeBypassesStates stateChange1 $ bypasses st1
+  in
+    StateMachine initialState0 acceptingState0 (transitions st0 ++ newTransitions1) (bypasses st0 ++ newBypasses1)
+
 -- regex +
 many1 :: StateMachine c -> StateMachine c
 many1 sm@(StateMachine is _ ts _) = 
