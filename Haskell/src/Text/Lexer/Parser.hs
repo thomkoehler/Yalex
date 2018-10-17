@@ -3,6 +3,7 @@ module Text.Lexer.Parser(parsePattern) where
 
 import Data.List
 import Text.ParserCombinators.Parsec as Parsec
+import Text.Parsec.Token
 
 
 import Text.Lexer.Predicate
@@ -40,9 +41,8 @@ simpleChar = fmap (newStateMachine . charPredicate) (noneOf metaChars)
 anyChar :: Parser (StateMachine Char)
 anyChar = char '.' >> return (newStateMachine anyCharPredicate)
 
-patt :: Parser (StateMachine Char)
-patt = do
-  p <- choice
+simplePattern :: Parser (StateMachine Char)
+simplePattern = choice
     [
       simpleChar,
       escapeChar,
@@ -50,6 +50,9 @@ patt = do
       Text.Lexer.Parser.oneOf
     ] 
 
+patt :: Parser (StateMachine Char)
+patt = do
+  p <- simplePattern
   q <- option id quantifier
   return $ q p;
 

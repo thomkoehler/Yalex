@@ -11,6 +11,7 @@ module Text.Lexer.StateMachine
 ) 
 where
 
+
 import Data.Foldable
 import Data.List
 import Control.Arrow
