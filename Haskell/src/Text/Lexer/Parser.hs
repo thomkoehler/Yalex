@@ -3,8 +3,6 @@ module Text.Lexer.Parser(parsePattern) where
 
 import Data.List
 import Text.ParserCombinators.Parsec as Parsec
-import Text.Parsec.Token
-
 
 import Text.Lexer.Predicate
 import Text.Lexer.StateMachine as SM

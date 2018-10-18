@@ -25,8 +25,8 @@ instance Stream T.Text Char where
 
 consume :: Stream s c => Int -> s -> Maybe (s, s)
 consume 0 s = Just (empty, s)
-consume length s = case uncons s of
+consume len s = case uncons s of
   Nothing -> Nothing
-  Just (c, cs) -> case consume (length - 1) cs of
+  Just (c, cs) -> case consume (len - 1) cs of
     Nothing -> Nothing
     Just (cs', rest) -> Just (cons c cs', rest)

@@ -4,6 +4,7 @@ module Text.Lexer.StateMachine
   StateMachine, 
   Predicate(..), 
   newStateMachine, 
+  (<|>),
   many1,
   many,
   optional,
@@ -80,10 +81,10 @@ st0 <|> st1 =
       initialState1 = initialState st1
       acceptingState1 = acceptingState st1
       maxState0 = foldl' max 0 $ initialState0 : acceptingState0 : transitionStates st0
-      stateChange1 state = case state of
-        initialState1 -> initialState0
-        acceptingState1 -> acceptingState0
-        _ -> state + maxState0
+      stateChange1 state
+        | state == initialState1 = initialState0
+        | state == acceptingState1 = acceptingState0
+        | otherwise = state + maxState0
 
       newTransitions1 = changeTransitionStates stateChange1 $ transitions st1
       newBypasses1 = changeBypassesStates stateChange1 $ bypasses st1
