@@ -54,13 +54,21 @@ patt = do
   q <- option id quantifier
   return $ q p;
 
-quantifier :: Parser (StateMachine c -> StateMachine c)
+quantifier :: Parser (StateMachine Char -> StateMachine Char)
 quantifier = choice
   [
     char '*' >> return SM.many,
     char '+' >> return SM.many1,
-    char '?' >> return SM.optional
+    char '?' >> return SM.optional,
+    char '|' >> combinedPattern
   ]
+
+
+combinedPattern :: Parser (StateMachine Char -> StateMachine Char)
+combinedPattern = do
+  p <- patt
+  return $ \sm -> sm SM.<|> p
+
 
 patterns :: Parser (StateMachine Char)
 patterns = do
