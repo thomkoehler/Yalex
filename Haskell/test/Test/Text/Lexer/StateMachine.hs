@@ -92,6 +92,23 @@ prop_oneOf1 = stateMachineTest "a[1234567890]*b" "a321b" 5
 prop_oneOf2 :: Bool
 prop_oneOf2 = stateMachineTest "a[1234567890]*b" "321b" 0
 
+prop_or0 :: Bool
+prop_or0 = stateMachineTest "a|b" "a" 1
+
+prop_or1 :: Bool
+prop_or1 = stateMachineTest "a|b" "b" 1
+
+prop_or2 :: Bool
+prop_or2 = stateMachineTest "a|b" "c" 0
+
+prop_or3 :: Bool
+prop_or3 = stateMachineTest "(ab)|(cd)" "ab" 2
+
+prop_or4 :: Bool
+prop_or4 = stateMachineTest "(ab)|(cd)" "cd" 2
+
+prop_or5 :: Bool
+prop_or5 = stateMachineTest "(ab)|(cd)" "ad" 0
 
 stateMachineTest :: String -> String -> Int -> Bool
 stateMachineTest pat input match = run (parsePattern pat) input == match

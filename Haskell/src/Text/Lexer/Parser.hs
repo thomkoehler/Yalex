@@ -45,8 +45,16 @@ simplePattern = choice
       simpleChar,
       escapeChar,
       Text.Lexer.Parser.anyChar,
-      Text.Lexer.Parser.oneOf
+      Text.Lexer.Parser.oneOf,
+      bracket
     ] 
+
+bracket :: Parser (StateMachine Char)
+bracket = do
+  _ <- char '('
+  ps <- patterns
+  _ <- char ')'
+  return ps
 
 patt :: Parser (StateMachine Char)
 patt = do
