@@ -1,11 +1,11 @@
 
-module Text.Lexer.Parser(parsePattern) where
+module Text.Yalex.Parser(parsePattern) where
 
 import Data.List
 import Text.ParserCombinators.Parsec as Parsec
 
-import Text.Lexer.Predicate
-import Text.Lexer.StateMachine as SM
+import Text.Yalex.Predicate
+import Text.Yalex.StateMachine as SM
 
 
 metaChars :: String
@@ -44,8 +44,8 @@ simplePattern = choice
     [
       simpleChar,
       escapeChar,
-      Text.Lexer.Parser.anyChar,
-      Text.Lexer.Parser.oneOf,
+      Text.Yalex.Parser.anyChar,
+      Text.Yalex.Parser.oneOf,
       bracket
     ] 
 

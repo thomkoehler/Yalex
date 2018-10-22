@@ -1,5 +1,5 @@
 
-module Text.Lexer.Predicate where
+module Text.Yalex.Predicate where
 
 data Predicate c = Predicate
   {

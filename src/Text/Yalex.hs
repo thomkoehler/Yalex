@@ -1,13 +1,13 @@
 
-module Text.Lexer(scan, scan') where
+module Text.Yalex(scan, scan') where
 
 import Data.List
 import Data.Maybe
 import Control.Arrow
 
-import Text.Lexer.Stream as Stream
-import Text.Lexer.Parser
-import Text.Lexer.StateMachine
+import Text.Yalex.Stream as Stream
+import Text.Yalex.Parser
+import Text.Yalex.StateMachine
 
 scan :: [(String, String -> Maybe t)] -> String -> (Bool, [t])
 scan lexerDef = scan' lexerDef'

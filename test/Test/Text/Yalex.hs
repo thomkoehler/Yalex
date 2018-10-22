@@ -1,11 +1,11 @@
 
 {-# OPTIONS_GHC -F -pgmF htfpp #-}
 
-module Test.Text.Lexer(htf_thisModulesTests) where
+module Test.Text.Yalex(htf_thisModulesTests) where
 
 import Test.Framework
 
-import Text.Lexer
+import Text.Yalex
 
 data Token 
   = TokenIf

@@ -1,6 +1,5 @@
-name:                ParserStuff
+name:                Yalex
 version:             0.1.0.0
-github:              "githubuser/ParserStuff"
 license:             BSD3
 author:              "Author name here"
 maintainer:          "example@example.com"
@@ -21,14 +20,14 @@ dependencies:
 library:
   source-dirs: src
   exposed-modules:
-    - Text.Lexer
-    - Text.Lexer.StateMachine
-    - Text.Lexer.Parser
+    - Text.Yalex
+    - Text.Yalex.StateMachine
+    - Text.Yalex.Parser
   ghc-options:
     - -Wall
 
 executables:
-  ParserStuff:
+  Yalex:
     main:                Main.hs
     source-dirs:         app
     ghc-options:
@@ -37,10 +36,10 @@ executables:
     - -with-rtsopts=-N
     - -Wall
     dependencies:
-    - ParserStuff
+    - Yalex
 
 tests:
-  ParserStuff-test:
+  Yalex-test:
     main:                Spec.hs
     source-dirs:         test
     ghc-options:
@@ -49,4 +48,4 @@ tests:
     - -with-rtsopts=-N
     - -Wall
     dependencies:
-    - ParserStuff
+    - Yalex

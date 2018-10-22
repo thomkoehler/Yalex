@@ -1,8 +1,8 @@
 module Main where
 
-import Text.Lexer.Parser
-import Text.Lexer.StateMachine
-import Text.Lexer
+import Text.Yalex.Parser
+import Text.Yalex.StateMachine
+import Text.Yalex
 
 data Token 
   = TokenIf

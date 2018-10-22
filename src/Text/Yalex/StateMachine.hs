@@ -1,5 +1,5 @@
 
-module Text.Lexer.StateMachine
+module Text.Yalex.StateMachine
 (
   StateMachine, 
   Predicate(..), 
@@ -17,8 +17,8 @@ import Data.Foldable
 import Data.List
 import Control.Arrow
 
-import Text.Lexer.Predicate
-import Text.Lexer.Stream
+import Text.Yalex.Predicate
+import Text.Yalex.Stream as Stream
 
 type State = Int
 type TransitionList c = [(State, (State, Predicate c))]
@@ -47,7 +47,7 @@ run stateMachine stream = foldl max 0 positions
     positions = map fst $ snd $ go [initialState stateMachine] [] 1 stream
 
     go currStates acceptedStates pos currStream = 
-      case Text.Lexer.Stream.uncons currStream of
+      case Stream.uncons currStream of
         Nothing -> (currStates, acceptedStates)
         Just (c, cs) -> 
           let

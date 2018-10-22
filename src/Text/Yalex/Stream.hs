@@ -2,7 +2,7 @@
 {-# LANGUAGE FunctionalDependencies #-}
 {-# LANGUAGE FlexibleInstances #-}
 
-module Text.Lexer.Stream where
+module Text.Yalex.Stream where
 
 import qualified Data.Text as T
 

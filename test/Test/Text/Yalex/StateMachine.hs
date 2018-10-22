@@ -1,12 +1,12 @@
 
 {-# OPTIONS_GHC -F -pgmF htfpp #-}
 
-module Test.Text.Lexer.StateMachine(htf_thisModulesTests) where
+module Test.Text.Yalex.StateMachine(htf_thisModulesTests) where
 
 import Test.Framework
 
-import Text.Lexer.Parser
-import Text.Lexer.StateMachine
+import Text.Yalex.Parser
+import Text.Yalex.StateMachine
 
 prop_SingleChar1 :: Bool
 prop_SingleChar1 = stateMachineTest "a" "a" 1
