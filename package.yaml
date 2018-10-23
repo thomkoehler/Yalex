@@ -7,7 +7,6 @@ copyright:           "2018 Author name here"
 
 extra-source-files:
 - README.md
-- ChangeLog.md
 
 description: Please see the README on GitHub at <https://github.com/githubuser/ParserStuff#readme>
 
@@ -22,7 +21,7 @@ library:
   exposed-modules:
     - Text.Yalex
     - Text.Yalex.StateMachine
-    - Text.Yalex.Parser
+    - Text.Yalex.PatternParser
   ghc-options:
     - -Wall
 

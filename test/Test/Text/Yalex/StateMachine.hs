@@ -5,7 +5,7 @@ module Test.Text.Yalex.StateMachine(htf_thisModulesTests) where
 
 import Test.Framework
 
-import Text.Yalex.Parser
+import Text.Yalex.PatternParser
 import Text.Yalex.StateMachine
 
 prop_SingleChar1 :: Bool

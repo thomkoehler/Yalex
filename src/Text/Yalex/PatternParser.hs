@@ -1,5 +1,5 @@
 
-module Text.Yalex.Parser(parsePattern) where
+module Text.Yalex.PatternParser(parsePattern) where
 
 import Data.List
 import Text.ParserCombinators.Parsec as Parsec
@@ -44,8 +44,8 @@ simplePattern = choice
     [
       simpleChar,
       escapeChar,
-      Text.Yalex.Parser.anyChar,
-      Text.Yalex.Parser.oneOf,
+      Text.Yalex.PatternParser.anyChar,
+      Text.Yalex.PatternParser.oneOf,
       bracket
     ] 
 

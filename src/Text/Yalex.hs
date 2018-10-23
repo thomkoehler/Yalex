@@ -6,7 +6,7 @@ import Data.Maybe
 import Control.Arrow
 
 import Text.Yalex.Stream as Stream
-import Text.Yalex.Parser
+import Text.Yalex.PatternParser
 import Text.Yalex.StateMachine
 
 scan :: [(String, String -> Maybe t)] -> String -> (Bool, [t])

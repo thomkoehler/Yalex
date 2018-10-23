@@ -1,6 +1,6 @@
 module Main where
 
-import Text.Yalex.Parser
+import Text.Yalex.PatternParser
 import Text.Yalex.StateMachine
 import Text.Yalex
 
