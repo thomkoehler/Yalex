@@ -2,6 +2,7 @@
 module Text.Yalex.PatternParser(parsePattern) where
 
 import Data.List
+import Data.Maybe
 import Text.ParserCombinators.Parsec as Parsec
 
 import Text.Yalex.Predicate
@@ -71,12 +72,10 @@ quantifier = choice
     char '|' >> combinedPattern
   ]
 
-
 combinedPattern :: Parser (StateMachine Char -> StateMachine Char)
 combinedPattern = do
   p <- patt
   return $ \sm -> sm SM.<|> p
-
 
 patterns :: Parser (StateMachine Char)
 patterns = do
@@ -87,3 +86,35 @@ parsePattern :: String -> StateMachine Char
 parsePattern input = case parse patterns "" input of
   Left err -> error $ show err
   Right sm -> sm
+
+data EscChar 
+  = SimpleChar Char
+  | EscChar Char
+  deriving Eq
+
+toEscChars :: String -> [EscChar]
+toEscChars [] = []
+toEscChars ('\\' : c  : rest) = EscChar c : toEscChars rest
+toEscChars (c : rest) = SimpleChar c : toEscChars rest
+
+fromEscChars :: [EscChar] -> String
+fromEscChars = map conv
+  where
+    conv (SimpleChar c) = c
+    conv (EscChar c) = unescapeChar c
+
+parseRangePattern :: String -> (String, [(Char, Char)])
+parseRangePattern patt = undefined
+  where
+    nextFun :: ([EscChar], [(EscChar, EscChar)], Bool, Maybe  EscChar) -> EscChar -> ([EscChar], [(EscChar, EscChar)], Bool, Maybe  EscChar) 
+    nextFun (charSet, charRanges, inRange, mbLastChar) char = undefined
+    nextFun (_, _, True, Nothing) char = error "Wrong range pattern encountered"
+    nextFun (charSet, charRanges, True, Just lastChar) char = (charSet, (lastChar, char) : charRanges, False, Nothing)
+    nextFun (charSet, charRanges, False, mbLastChar) char = case (char, mbLastChar) of
+      (SimpleChar '-', _) -> (charSet, charRanges, True, mbLastChar)
+      (_, Nothing) -> (charSet, charRanges, False, Just char)
+      _ -> (char : charSet, charRanges, False, mbLastChar)
+
+    nextResult = foldl nextFun ([], [], False, Nothing) $ toEscChars patt
+      
+      
