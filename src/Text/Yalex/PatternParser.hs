@@ -1,7 +1,14 @@
 
-module Text.Yalex.PatternParser(parsePattern) where
+module Text.Yalex.PatternParser
+(
+  parsePattern, 
+  parseRangePattern
+) 
+where
 
+import Control.Arrow
 import Data.List
+import Data.Maybe
 import Text.ParserCombinators.Parsec as Parsec
 
 import Text.Yalex.Predicate
@@ -23,12 +30,12 @@ unescapeStr [] = []
 unescapeStr ('\\' : c : rest) = unescapeChar c : unescapeStr rest
 unescapeStr (c:cs) = c : unescapeStr cs
 
-oneOf :: Parser (StateMachine Char)
-oneOf = do
+charRanges :: Parser (StateMachine Char)
+charRanges = do
   _ <- char '['
   chars <- Parsec.many1 (noneOf "]")
   _ <- char ']'
-  return $ newStateMachine $ oneOfPredicate $ unescapeStr chars
+  return $ newStateMachine $ rangesPredicate chars
 
 escapeChar :: Parser (StateMachine Char)
 escapeChar = char '\\' >> fmap (newStateMachine . charPredicate . unescapeChar) Parsec.anyChar 
@@ -45,7 +52,7 @@ simplePattern = choice
       simpleChar,
       escapeChar,
       Text.Yalex.PatternParser.anyChar,
-      Text.Yalex.PatternParser.oneOf,
+      charRanges,
       bracket
     ] 
 
@@ -71,12 +78,10 @@ quantifier = choice
     char '|' >> combinedPattern
   ]
 
-
 combinedPattern :: Parser (StateMachine Char -> StateMachine Char)
 combinedPattern = do
   p <- patt
   return $ \sm -> sm SM.<|> p
-
 
 patterns :: Parser (StateMachine Char)
 patterns = do
@@ -87,3 +92,35 @@ parsePattern :: String -> StateMachine Char
 parsePattern input = case parse patterns "" input of
   Left err -> error $ show err
   Right sm -> sm
+
+data EscChar 
+  = SimpleChar Char
+  | EscChar Char
+  deriving Eq
+
+toEscChars :: String -> [EscChar]
+toEscChars [] = []
+toEscChars ('\\' : c  : rest) = EscChar c : toEscChars rest
+toEscChars (c : rest) = SimpleChar c : toEscChars rest
+
+fromEscChar :: EscChar -> Char
+fromEscChar (SimpleChar c) = c
+fromEscChar (EscChar c) = unescapeChar c
+
+parseRangePattern :: String -> CharRanges Char
+parseRangePattern patt = case nextResult of
+  (charSet, charRanges, False, Nothing) -> CharRanges {chars = map fromEscChar charSet, ranges = map (fromEscChar *** fromEscChar) charRanges}
+  (charSet, charRanges, False, Just char) -> CharRanges { chars = map fromEscChar (char : charSet), ranges = map (fromEscChar *** fromEscChar) charRanges}
+  _ -> error "Wrong range pattern encountered"
+  where
+    nextFun :: ([EscChar], [(EscChar, EscChar)], Bool, Maybe  EscChar) -> EscChar -> ([EscChar], [(EscChar, EscChar)], Bool, Maybe  EscChar) 
+    nextFun (_, _, True, Nothing) char = error "Wrong range pattern encountered"
+    nextFun (charSet, charRanges, True, Just lastChar) char = (charSet, (lastChar, char) : charRanges, False, Nothing)
+    nextFun (charSet, charRanges, False, mbLastChar) char = case (char, mbLastChar) of
+      (SimpleChar '-', _) -> (charSet, charRanges, True, mbLastChar)
+      (_, Nothing) -> (charSet, charRanges, False, Just char)
+      (_, Just lastChar) -> (lastChar : charSet, charRanges, False, Just char)
+
+    nextResult = foldl nextFun ([], [], False, Nothing) $ toEscChars patt
+      
+      

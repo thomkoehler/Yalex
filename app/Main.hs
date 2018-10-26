@@ -26,8 +26,9 @@ lexerDef =
 main :: IO ()
 main = do
   let sm = parsePattern "(ab)|(cd)"
-  print sm
-  print $ run sm "ab"
-  print $ run sm "cd"
-  print $ run sm "ad"
+  -- print sm
+  -- print $ run sm "ab"
+  -- print $ run sm "cd"
+  -- print $ run sm "ad"
   -- print $ scan lexerDef "if 123"
+  print $ parseRangePattern "abcy-z"

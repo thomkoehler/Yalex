@@ -22,6 +22,7 @@ library:
     - Text.Yalex
     - Text.Yalex.StateMachine
     - Text.Yalex.PatternParser
+    - Text.Yalex.Predicate
   ghc-options:
     - -Wall
 
