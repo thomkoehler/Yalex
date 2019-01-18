@@ -21,7 +21,6 @@ library:
   source-dirs: src
   exposed-modules:
     - Text.Yalex
-    - Text.YalexQ
     - Text.Yalex.StateMachine
     - Text.Yalex.PatternParser
     - Text.Yalex.Predicate
