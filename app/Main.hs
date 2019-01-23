@@ -25,10 +25,10 @@ lexerDef =
 
 main :: IO ()
 main = do
-  let sm = parsePattern "(ab)|(cd)"
-  -- print sm
-  -- print $ run sm "ab"
-  -- print $ run sm "cd"
+  -- let sm = parsePattern "a{1,2}" -- StateMachine {initialState = 0, acceptingState = 2, transitions = [(0,(1,'a')),(1,(2,'a'))], bypasses = [(1,2)]}
+  let sm = parsePattern "aa?"
+  print sm
+  print $ run sm "a"
   -- print $ run sm "ad"
   -- print $ scan lexerDef "if 123"
-  print $ parseRangePattern "abcy-z"
+  -- print $ parseRangePattern "abcy-z"

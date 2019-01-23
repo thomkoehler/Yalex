@@ -8,6 +8,7 @@ module Text.Yalex.StateMachine
   many1,
   many,
   optional,
+  quantify,
   run
 ) 
 where
@@ -73,6 +74,9 @@ instance Semigroup (StateMachine c) where
     in
       StateMachine initialState0 (acceptingState st1 + maxState0) (transitions st0 ++ newTransitions1) (bypasses st0 ++ newBypasses1)
 
+instance Monoid (StateMachine c) where
+  mempty = StateMachine 0 0 [] []
+
 (<|>) :: StateMachine c -> StateMachine c -> StateMachine c
 st0 <|> st1 = 
   let
@@ -108,6 +112,11 @@ many :: StateMachine c -> StateMachine c
 many sm@(StateMachine is as ts _) = sm { acceptingState = is, transitions = map stateChange ts }
   where
     stateChange trans@(st0, (st1, predicate)) = if st1 == as then (st0, (is, predicate)) else trans
+
+quantify :: Int -> Int -> StateMachine c -> StateMachine c
+quantify min' max' sm 
+  | min' > max' = error "The max quantifier must be greater than the min quantifier."
+  | otherwise = mconcat $ replicate min' sm ++ replicate (max' - min') (optional sm)
 
 transitionStates :: StateMachine c -> [Int]
 transitionStates (StateMachine is as ts _) = filter (\state -> state /= is && state /= as) $ map fst ts

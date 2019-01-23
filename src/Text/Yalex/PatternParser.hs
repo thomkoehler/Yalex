@@ -9,6 +9,9 @@ where
 import Control.Arrow
 import Data.List
 import Text.ParserCombinators.Parsec as Parsec
+import Text.Parsec.Language
+import qualified Text.Parsec.Token as P
+import Data.Functor.Identity
 
 import Text.Yalex.Predicate
 import Text.Yalex.StateMachine as SM
@@ -23,6 +26,12 @@ unescapeChar 'r' = '\r'
 unescapeChar 't' = '\t'
 unescapeChar 'f' = '\f'
 unescapeChar c = c
+
+lexer :: P.GenTokenParser String () Identity
+lexer = P.makeTokenParser haskellDef
+
+natural :: Parser Integer
+natural = P.natural lexer
 
 charRanges :: Parser (StateMachine Char)
 charRanges = do
@@ -69,8 +78,16 @@ quantifier = choice
     char '*' >> return SM.many,
     char '+' >> return SM.many1,
     char '?' >> return SM.optional,
+    char '{' >> minMaxQuantifier,
     char '|' >> combinedPattern
   ]
+
+minMaxQuantifier :: Parser (StateMachine Char -> StateMachine Char)
+minMaxQuantifier = do
+  min' <- fmap fromEnum natural
+  max' <- option 0 $ char ',' >> fmap fromEnum natural
+  _ <- char '}'
+  return $ SM.quantify min' max'
 
 combinedPattern :: Parser (StateMachine Char -> StateMachine Char)
 combinedPattern = do
