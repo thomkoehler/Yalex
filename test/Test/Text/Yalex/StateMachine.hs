@@ -110,8 +110,23 @@ prop_or4 = stateMachineTest "(ab)|(cd)" "cd" 2
 prop_or5 :: Bool
 prop_or5 = stateMachineTest "(ab)|(cd)" "ad" 0
 
-prop_quant0 :: Bool
-prop_quant0 = stateMachineTest "a{1,2}" "a" 1
+prop_quant :: Bool
+prop_quant = stateMachineTests 
+  [
+    ("a{1,2}", "a", 1),
+    ("a{1,2}", "b", 0),
+    ("a{1,2}", "aa", 2),
+    ("a{1,2}", "ab", 1),
+    ("(ab){1,2}", "ab", 2),
+    ("(ab){1,2}", "ba", 0),
+    ("(ab){1,2}", "abab", 4),
+    ("(ab){1,2}", "aba", 2),
+    ("a{1,1}", "aaaa", 1)
+  ]
+
+
+stateMachineTests :: [(String, String, Int)] -> Bool
+stateMachineTests = all (\ (pat, input, match) -> stateMachineTest pat input match)
 
 stateMachineTest :: String -> String -> Int -> Bool
 stateMachineTest pat input match = run (parsePattern pat) input == match

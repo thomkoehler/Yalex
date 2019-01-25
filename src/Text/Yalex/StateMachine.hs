@@ -34,9 +34,10 @@ data StateMachine c = StateMachine
   deriving Show
 
 calcNextStates :: StateMachine c -> c -> [State] -> [State]
-calcNextStates sm@(StateMachine _ _ _ bps) input states = concatMap (calcNextStates' sm input) $ nub states ++ bypassed
+calcNextStates sm@(StateMachine _ _ _ bps) input states = nub statesWithoutOutBp ++ calcBypasses statesWithoutOutBp
   where
-    bypassed = map snd $ filter (\(fromState, _) -> elem fromState states) bps
+    statesWithoutOutBp = concatMap (calcNextStates' sm input) $ nub states ++ calcBypasses states
+    calcBypasses sts = map snd $ filter (\(fromState, _) -> elem fromState sts) bps
 
 calcNextStates' :: StateMachine  c -> c -> State -> [State]
 calcNextStates' stateMachine input state = map fst . filter (\(_, predicate) -> predFun predicate input) . map snd . filter (\(entryState, _) -> entryState == state) $ transitions stateMachine
@@ -115,7 +116,7 @@ many sm@(StateMachine is as ts _) = sm { acceptingState = is, transitions = map 
 
 quantify :: Int -> Int -> StateMachine c -> StateMachine c
 quantify min' max' sm 
-  | min' > max' = error "The max quantifier must be greater than the min quantifier."
+  | min' > max' = error "The max quantifier must be greater or equal than the min quantifier."
   | otherwise = mconcat $ replicate min' sm ++ replicate (max' - min') (optional sm)
 
 transitionStates :: StateMachine c -> [Int]
