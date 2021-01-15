@@ -2,3 +2,4 @@
 *.cabal
 *~
 .HTF/
+stack.yaml.lock
